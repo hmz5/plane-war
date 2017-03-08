@@ -1,0 +1,328 @@
+
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+        <script type="text/javascript">
+            var openid = "<? echo $openId?>";
+            if(openid == ""){
+                window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx707e82b97a87acd5&redirect_uri=http://www.heminzhi.cn/planeFight/index.php&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect";
+            }
+        </script>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			html,body{
+				height: 100%;
+			}
+			body{
+				position: relative;
+			}
+			#loading{
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				z-index: 10;
+			}
+			#loading img{
+				position: absolute;
+				top: 70%;
+				left: 50%;
+				width: 30px;
+				height: 30px;
+				margin-left: -15px;
+			}
+			#canvas{
+				display: none;
+			}
+			#wrap{
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				display: none;
+			}
+			.gameOver{
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				width: 200px;
+				height: 150px;
+				margin-left: -100px;
+				margin-top: -75px;
+				border: 3px solid rgb(94,98,98);
+				border-radius: 10px;
+				background-color: rgb(204,204,204);
+			}
+			.gameOver .top{
+				height: 40px;
+				line-height: 40px;
+				padding: 5px 20px;
+				overflow: hidden;
+				border-bottom: 3px solid rgb(94,98,98);
+			}
+			.gameOver .top .get{
+				width: 60px;
+				text-align: center;
+				float: left;
+			}
+			.gameOver .top #score{
+				width: 100px;
+				text-align: center;
+				float: left;
+			}
+			.gameOver .bottom{
+				padding: 9px;
+			}
+			.gameOver .bottom .over{
+				width: 130px;
+				height: 30px;
+				line-height: 30px;
+				text-align: center;
+				border: 3px solid rgb(94,98,98);
+				border-radius: 10px;
+				margin: 0 auto;
+			}
+			.gameOver .bottom #again{
+				width: 130px;
+				height: 30px;
+				line-height: 30px;
+				text-align: center;
+				border: 3px solid rgb(94,98,98);
+				border-radius: 10px;
+				margin: 7px auto 0;
+			}
+			#hold{
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				display: none;
+			}
+			#continue{
+				font-size: 20px;
+				width: 130px;
+				height: 30px;
+				line-height: 30px;
+				text-align: center;
+				border: 3px solid rgb(94,98,98);
+				border-radius: 10px;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-top: -40px;
+				margin-left: -68px;
+			}
+			#restart{
+				font-size: 20px;
+				width: 130px;
+				height: 30px;
+				line-height: 30px;
+				text-align: center;
+				border: 3px solid rgb(94,98,98);
+				border-radius: 10px;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-top: 10px;
+				margin-left: -68px;
+			}
+			#start{
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+			#start img{
+				width: 100%;
+				height: 100%;
+				float: left;
+			}
+			#start span{
+				font-size: 50px;
+				position: absolute;
+				font-family: "微软雅黑";
+				font-weight: bold;
+				top: 80px;
+				left: 50%;
+				width: 300px;
+				margin-left: -150px;
+				text-align: center;
+				color: rgb(137,144,143);
+			}
+			#start .hmz{
+				font-size: 30px;
+				position: absolute;
+				font-family: "微软雅黑";
+				top: 200px;
+				width: 100%;
+				text-align: center;
+				color: rgb(137,144,143);
+			}
+			#startGame{
+				font-size: 20px;
+				width: 130px;
+				height: 30px;
+				line-height: 30px;
+				text-align: center;
+				border: 3px solid rgb(94,98,98);
+				border-radius: 10px;
+				position: absolute;
+				top: 70%;
+				left: 50%;
+				margin-top: 10px;
+				margin-left: -68px;
+				display: none;
+			}
+			#bill{
+				width: 80%;
+				height: 80%;
+				border: 2px solid rgb(78,78,78);
+				box-sizing: border-box;
+				border-radius: 5px;
+				position: absolute;
+				overflow: hidden;
+				z-index: 100;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%,-50%);
+				-webkit-transform: translate(-50%,-50%);
+				background-color: rgb(220,220,220);
+				display: none;
+			}
+			#bill .top{
+				height: 12%;
+				font-size: 25px;
+				font-weight: bold;
+				text-align: center;
+				line-height: 200%;
+				border-bottom: 2px solid rgb(78,78,78);
+				box-sizing: border-box;
+			}
+			#bill .player{
+				height: 78%;
+				border-bottom: 2px solid rgb(78,78,78);
+				box-sizing: border-box;
+				list-style: none;
+				overflow-y: scroll;
+			}
+			#bill .player li{
+				padding: 10px;
+				height: 40px;
+				overflow: hidden;
+				border-bottom: 1px solid rgb(78,78,78);
+			}
+			#bill .player li i{
+				width: 20px;
+				height: 40px;
+				font-size: 15px;
+				font-weight: bold;
+				text-align: center;
+				line-height: 40px;
+				float: left;
+			}
+			#bill .player li img{
+				width: 40px;
+				height: 40px;
+				float: left;
+			}
+			#bill .player li span{
+				float: left;
+				margin-left: 10px;
+				font-size: 14px;
+				line-height: 40px;
+			}
+			#bill .player li em{
+				float: right;
+				font-size: 14px;
+				line-height: 40px;
+			}
+			#bill #close{
+				height: 10%;
+				font-size: 20px;
+				text-align: center;
+				line-height: 200%;
+			}
+			.openid,.user,.imgUrl{
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+        <span class="openid"><? echo $openId?></span>
+		<span class="user"><? echo $userName?></span>
+		<span class="imgUrl"><? echo $imgUrl?></span>
+		<div id="loading">
+			<img src="img/loading.gif"/>
+		</div>
+		<div id="start">
+			<img src="img/background.png"/>
+			<span>“飞机大战”</span>
+			<div class="hmz">
+				无声版
+			</div>
+			<div id="startGame">
+				开始游戏
+			</div>
+		</div>
+		<canvas id="canvas" width="" height=""></canvas>
+		<div id="hold">
+			<div id="continue">
+				继续
+			</div>
+			<div id="restart">
+				重新开始
+			</div>
+		</div>
+		<div id="wrap">
+			<div class="gameOver">
+				<div class="top">
+					<span class="get">成绩:</span>
+					<span id="score">
+						
+					</span>
+				</div>
+				<div class="bottom">
+					<div class="over">
+						查看排行榜
+					</div>
+					<div id="again">
+						再玩一次
+					</div>
+				</div>
+			</div>
+			<div id="bill">
+				<div class="top">
+					飞机大战排行榜
+				</div>
+				<ul class="player">
+					
+				</ul>
+				<div id="close">
+					关闭排行榜
+				</div>
+			</div>
+		</div>
+		
+		<audio id="bgMusic" src="img/bullet.mp3"></audio>
+		<audio id="bulletMusic" src="img/bullet.mp3"></audio>
+		<audio id="emyOne" src="img/enemy1_down.mp3"></audio>
+		<audio id="emyTwo" src="img/enemy2_down.mp3"></audio>
+		<audio id="emyThree" src="img/enemy3_down.mp3"></audio>
+		<audio id="overMusic" src="img/game_over.mp3"></audio>
+	</body>
+	
+	<script src="jquery-1.12.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="index.js" type="text/javascript" charset="utf-8"></script>
+
+</html>
